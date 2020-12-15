@@ -1,0 +1,36 @@
+---
+galaxy_info:
+  role_name: x509_certificate
+  author: JoelKle
+  description: Manages X509 public, private and CA keys
+  company: N/A
+  license: BSD
+  min_ansible_version: 2.4
+  platforms:
+    # - name: FreeBSD
+    #   versions:
+    #     - 12.1
+    # - name: OpenBSD
+    #   versions:
+    #     - 6.7
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+    - name: EL
+      versions:
+        - 7
+        - 8
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+        - buster
+
+  galaxy_tags:
+    - certificate
+    - openssl
+    - x509
+    - ca
+
+dependencies: []

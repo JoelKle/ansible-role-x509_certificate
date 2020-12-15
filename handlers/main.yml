@@ -1,0 +1,14 @@
+---
+
+# Ensures there is always at least one listener to prevent Ansible errors
+- name: x509_certificate certificate changed
+  debug:
+    msg: x509_certificate certificate changed
+  changed_when: true
+  no_log: true
+
+- name: x509_certificate Create CA trust
+  command: '{{ x509_certificate__ca_handler_create }}'
+
+- name: x509_certificate Remove CA trust
+  command: '{{ x509_certificate__ca_handler_remove }}'

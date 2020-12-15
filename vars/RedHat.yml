@@ -1,0 +1,15 @@
+---
+__x509_certificate__public_dir: /etc/ssl
+__x509_certificate__ca_dir: /etc/pki/ca-trust/source/anchors
+__x509_certificate__private_dir: /etc/ssl
+__x509_certificate__packages:
+  - openssl
+  - ca-certificates
+__x509_certificate__public_default_owner: root
+__x509_certificate__public_default_group: root
+__x509_certificate__ca_default_owner: ~
+__x509_certificate__ca_default_group: ~
+__x509_certificate__private_default_owner: root
+__x509_certificate__private_default_group: root
+__x509_certificate__ca_handler_create: /usr/bin/update-ca-trust extract
+__x509_certificate__ca_handler_remove: "{{ __x509_certificate__ca_handler_create }}"

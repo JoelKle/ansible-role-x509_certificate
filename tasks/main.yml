@@ -1,0 +1,180 @@
+---
+# tasks file for ansible-role-x509_certificate
+
+- import_role:
+    name: 'ansible_plugins'
+
+- name: "Include variables from {{ ansible_os_family }}.yml"
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install x509_certificate__packages
+  package:
+    name: "{{ x509_certificate__packages }}"
+    state: present
+
+- name: Install x509_certificate__additional_packages
+  package:
+    name: "{{ x509_certificate__additional_packages }}"
+    state: present
+
+- name: Set x509_certificate__present
+  set_fact:
+    x509_certificate__present: "{{ x509_certificate__combined | parse_kv_items | selectattr('state', 'match', '^present$') | list }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+
+- name: Set x509_certificate__absent
+  set_fact:
+    x509_certificate__absent: "{{ x509_certificate__combined | parse_kv_items | selectattr('state', 'match', '^absent$') | list }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+
+- name: Create default public directory
+  file:
+    path: "{{ x509_certificate__public_dir }}"
+    state: directory
+    mode: 0755
+    owner: "{{ x509_certificate__public_default_owner }}"
+    group: "{{ x509_certificate__public_default_group }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+
+- name: Create default ca directory
+  file:
+    path: "{{ x509_certificate__ca_dir }}"
+    state: directory
+    mode: 02775
+    owner: "{{ x509_certificate__ca_default_owner }}"
+    group: "{{ x509_certificate__ca_default_group }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+
+- name: Create default private directory
+  file:
+    path: "{{ x509_certificate__private_dir }}"
+    state: directory
+    mode: 0710
+    owner: "{{ x509_certificate__private_default_owner }}"
+    group: "{{ x509_certificate__private_default_group }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+
+- name: Create directories for public keys
+  file:
+    path: "{{ item.public.path | dirname }}"
+    mode: 0755
+    state: directory
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__present }}"
+  when:
+    - "'public' in item"
+    - "'path' in item.public"
+    - item.public.path | length > 0
+
+- name: Create directories for ca keys
+  file:
+    path: "{{ item.ca.path | dirname }}"
+    mode: 02775
+    state: directory
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__present }}"
+  when:
+    - "'ca' in item"
+    - "'path' in item.ca"
+    - item.ca.path | length > 0
+
+- name: Create directories for private keys
+  file:
+    path: "{{ item.private.path | dirname }}"
+    mode: 0710
+    state: directory
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__present }}"
+  when:
+    - "'private' in item"
+    - "'path' in item.private"
+    - item.private.path | length > 0
+
+- name: Create public keys
+  copy:
+    content: "{{ item.public.key }}"
+    dest: "{{ item.public.path | default(x509_certificate__public_dir + '/' + item.name + '.crt') }}"
+    owner: "{{ item.public.owner | default(x509_certificate__public_default_owner) }}"
+    group: "{{ item.public.group | default(x509_certificate__public_default_group) }}"
+    mode: "{{ item.public.mode | default(x509_certificate__public_default_mode) }}"
+    validate: "{{ x509_certificate__validate_command_public[x509_certificate__validate_command] }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__present }}"
+  when:
+    - "'public' in item"
+  notify: x509_certificate certificate changed
+  register: _result_create_public_keys
+
+- name: Create ca keys
+  copy:
+    content: "{{ item.ca.key }}"
+    dest: "{{ item.ca.path | default(x509_certificate__ca_dir + '/' + item.name + '.crt') }}"
+    owner: "{{ item.ca.owner | default(x509_certificate__ca_default_owner) }}"
+    group: "{{ item.ca.group | default(x509_certificate__ca_default_group) }}"
+    mode: "{{ item.ca.mode | default(x509_certificate__ca_default_mode) }}"
+    validate: "{{ x509_certificate__validate_command_ca[x509_certificate__validate_command] }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__present }}"
+  when:
+    - "'ca' in item"
+  notify: x509_certificate Create CA trust
+
+- name: Create private keys
+  copy:
+    content: "{{ item.private.key }}"
+    dest: "{{ item.private.path | default(x509_certificate__private_dir + '/' + item.name + '.key') }}"
+    owner: "{{ item.private.owner | default(x509_certificate__private_default_owner) }}"
+    group: "{{ item.private.group | default(x509_certificate__private_default_group) }}"
+    mode: "{{ item.private.mode | default(x509_certificate__private_default_mode) }}"
+    validate: "{{ x509_certificate__validate_command_private[x509_certificate__validate_command] }}"
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__present }}"
+  when:
+    - "'private' in item"
+  notify: x509_certificate certificate changed
+  register: _result_create_private_keys
+
+- name: Remove public keys
+  file:
+    path: "{{ item.public.path | default(x509_certificate__public_dir + '/' + item.name + '.crt') }}"
+    state: absent
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__absent }}"
+  when:
+    - "'public' in item"
+  notify: x509_certificate certificate changed
+  register: _result_remove_public_keys
+
+- name: Remove ca keys
+  file:
+    path: "{{ item.ca.path | default(x509_certificate__ca_dir + '/' + item.name + '.crt') }}"
+    state: absent
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__absent }}"
+  when:
+    - "'ca' in item"
+  notify: x509_certificate Remove CA trust
+
+- name: Remove private keys
+  file:
+    path: "{{ item.private.path | default(x509_certificate__private_dir + '/' + item.name + '.key') }}"
+    state: absent
+  no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"
+  with_items: "{{ x509_certificate__absent }}"
+  when:
+    - "'private' in item"
+  notify: x509_certificate certificate changed
+  register: _result_remove_private_keys
+
+- name: Parse certificate set result variable
+  set_fact:
+    _x509_changed_certificates: |
+      {% set _result = [] %}
+      {% for item in [_result_create_public_keys,_result_create_private_keys,_result_remove_public_keys,_result_remove_private_keys] %}
+      {%   for res in item.results %}
+      {%     if res.changed and not res.failed %}
+      {%       set _ = _result.append({'name': res['item']['name'], 'path': res.get('dest') or res.get('path'), 'state': res['state']}) %}
+      {%     endif %}
+      {%   endfor %}
+      {% endfor %}
+      {{ _result|d() }}

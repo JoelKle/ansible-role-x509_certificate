@@ -1,0 +1,14 @@
+---
+__x509_certificate__public_dir: /usr/local/etc/ssl
+__x509_certificate__ca_dir: ~
+__x509_certificate__private_dir: /usr/local/etc/ssl
+__x509_certificate__packages:
+  - ca-certificates
+__x509_certificate__public_default_owner: root
+__x509_certificate__public_default_group: wheel
+__x509_certificate__ca_default_owner: ~
+__x509_certificate__ca_default_group: ~
+__x509_certificate__private_default_owner: root
+__x509_certificate__private_default_group: wheel
+__x509_certificate__ca_handler_create: ~
+__x509_certificate__ca_handler_remove: ~

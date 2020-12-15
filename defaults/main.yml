@@ -1,0 +1,33 @@
+---
+x509_certificate__public_dir: "{{ __x509_certificate__public_dir }}"
+x509_certificate__ca_dir: "{{ __x509_certificate__ca_dir }}"
+x509_certificate__private_dir: "{{ __x509_certificate__private_dir }}"
+x509_certificate__packages: "{{ __x509_certificate__packages }}"
+x509_certificate__public_default_owner: "{{ __x509_certificate__public_default_owner }}"
+x509_certificate__public_default_group: "{{ __x509_certificate__public_default_group }}"
+x509_certificate__public_default_mode: '0444'
+x509_certificate__ca_default_owner: "{{ __x509_certificate__ca_default_owner }}"
+x509_certificate__ca_default_group: "{{ __x509_certificate__ca_default_group }}"
+x509_certificate__ca_default_mode: '0444'
+x509_certificate__private_default_owner: "{{ __x509_certificate__private_default_owner }}"
+x509_certificate__private_default_group: "{{ __x509_certificate__private_default_group }}"
+x509_certificate__private_default_mode: '0400'
+x509_certificate__additional_packages: []
+x509_certificate__validate_command: openssl
+x509_certificate__validate_command_public:
+  openssl: openssl x509 -noout -in %s
+x509_certificate__validate_command_ca: "{{ x509_certificate__validate_command_public }}"
+x509_certificate__validate_command_private:
+  openssl: openssl rsa -check -in %s
+x509_certificate__ca_handler_create: "{{ __x509_certificate__ca_handler_create }}"
+x509_certificate__ca_handler_remove: "{{ __x509_certificate__ca_handler_remove }}"
+x509_certificate__debug_log: false
+
+x509_certificate__dependent: []
+x509_certificate: []
+x509_certificate__group: []
+x509_certificate__host: []
+x509_certificate__combined: '{{ x509_certificate__dependent
+                              + x509_certificate
+                              + x509_certificate__group
+                              + x509_certificate__host }}'
