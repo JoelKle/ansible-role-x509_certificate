@@ -1,5 +1,12 @@
 ---
+# At the moment any skip_list entry causes ansible-lint to return 0,
+# that means it gives for all other errors false negatives.
+# See https://github.com/ansible/ansible-lint/issues/1102
+# Workaround for now would be not use skip_list, but individual noqa statements
 
-skip_list:
-  # 701: meta/main.yml should contain relevant info
-  - '701'
+#skip_list:
+#  # 106: Role name TEMPLATE does not match ``^[a-z][a-z0-9_]+$`` pattern
+#  # role is only a TEMPLATE role, not used per se
+#  - '106'
+#  # 701: meta/main.yml should contain relevant info
+#  - '701'
