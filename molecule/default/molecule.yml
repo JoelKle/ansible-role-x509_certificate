@@ -1,0 +1,80 @@
+---
+#
+# Based on:
+# https://github.com/nginxinc/ansible-role-nginx/blob/main/molecule/default/molecule.yml
+#
+# https://github.com/robertdebock/ansible-role-bootstrap/blob/master/molecule/default/molecule.yml
+# https://github.com/robertdebock/docker-ubuntu-systemd/blob/master/##/Dockerfile
+#
+# https://github.com/geerlingguy/docker-ubuntu2004-ansible
+#
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: docker
+lint: pre-commit run -a
+platforms:
+  - name: debian-stretch
+    image: debian:stretch-slim
+    dockerfile: debian-stretch/Dockerfile
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/sbin/init"
+  - name: debian-buster
+    image: debian:buster-slim
+    dockerfile: debian-buster/Dockerfile
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/sbin/init"
+  - name: ubuntu-xenial
+    image: ubuntu:xenial
+    dockerfile: ubuntu-xenial/Dockerfile
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/sbin/init"
+  - name: ubuntu-bionic
+    image: ubuntu:bionic
+    dockerfile: ubuntu-bionic/Dockerfile
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/sbin/init"
+  - name: ubuntu-focal
+    image: ubuntu:focal
+    dockerfile: ubuntu-focal/Dockerfile
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/sbin/init"
+  - name: redhat-7
+    image: registry.access.redhat.com/ubi7/ubi-init:latest
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/sbin/init"
+  - name: redhat-8
+    image: registry.access.redhat.com/ubi8/ubi-init:latest
+    privileged: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    command: "/sbin/init"
+scenario:
+  destroy_sequence:
+    - 'cleanup'
+    - 'destroy'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto'
+      stdout_callback: 'yaml'
+      callback_whitelist: 'profile_tasks,timer'
+    diff:
+      always: true
+verifier:
+  name: ansible

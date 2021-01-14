@@ -1,0 +1,7 @@
+---
+- name: 'Verify'
+  hosts: 'all'
+  become: true
+  tasks:
+    - debug:
+        msg: 'Add verify tasks'
