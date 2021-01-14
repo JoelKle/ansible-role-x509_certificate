@@ -7,15 +7,8 @@
 - name: "Include variables from {{ ansible_os_family }}.yml"
   include_vars: "{{ ansible_os_family }}.yml"
 
-- name: Install x509_certificate__packages
-  package:
-    name: "{{ x509_certificate__packages }}"
-    state: present
-
-- name: Install x509_certificate__additional_packages
-  package:
-    name: "{{ x509_certificate__additional_packages }}"
-    state: present
+- name: "Include tasks install-{{ ansible_os_family }}.yml"
+  include_tasks: "install-{{ ansible_os_family }}.yml"
 
 - name: Set x509_certificate__present
   set_fact:
@@ -40,7 +33,7 @@
   file:
     path: "{{ x509_certificate__ca_dir }}"
     state: directory
-    mode: 02775
+    mode: 0755
     owner: "{{ x509_certificate__ca_default_owner }}"
     group: "{{ x509_certificate__ca_default_group }}"
   no_log: "{% if x509_certificate__debug_log %}no{% else %}yes{% endif %}"

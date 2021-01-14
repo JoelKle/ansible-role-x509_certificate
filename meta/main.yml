@@ -13,17 +13,17 @@ galaxy_info:
     # - name: OpenBSD
     #   versions:
     #     - 6.7
-    - name: Ubuntu
-      versions:
-        - bionic
-        - focal
     - name: EL
       versions:
         - 7
         - 8
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+        - focal
     - name: Debian
       versions:
-        - jessie
         - stretch
         - buster
 

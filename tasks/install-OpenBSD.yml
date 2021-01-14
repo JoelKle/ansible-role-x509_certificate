@@ -1,0 +1,11 @@
+---
+
+- name: Install x509_certificate__packages
+  openbsd_pkg:
+    name: "{{ x509_certificate__packages }}"
+    state: present
+
+- name: Install x509_certificate__additional_packages
+  openbsd_pkg:
+    name: "{{ x509_certificate__additional_packages }}"
+    state: present

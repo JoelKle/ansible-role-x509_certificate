@@ -5,10 +5,11 @@ __x509_certificate__private_dir: /etc/ssl/private
 __x509_certificate__packages:
   - openssl
   - ca-certificates
+  - ssl-cert
 __x509_certificate__public_default_owner: root
 __x509_certificate__public_default_group: root
 __x509_certificate__ca_default_owner: root
-__x509_certificate__ca_default_group: staff
+__x509_certificate__ca_default_group: root
 __x509_certificate__private_default_owner: root
 __x509_certificate__private_default_group: ssl-cert
 __x509_certificate__ca_handler_create: /usr/sbin/update-ca-certificates
